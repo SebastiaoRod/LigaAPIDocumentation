@@ -1,0 +1,446 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title:  LigaAPI
+  license:
+    name: MIT
+
+security:
+  - ApiKeyAuth: []
+    
+servers:
+  - url: https://api.liga.ventures/
+  - url: https://dev.api.liga.ventures/
+  
+# tags are used for organizing operations
+tags:
+- name: Rest.ProgramScopes.Programas
+  description: ...
+- name: Rest.CompanyScopes.Companies
+  description: ...
+  
+paths:
+
+
+
+  /programas_aceleracao:
+    get:
+      summary: List Programas Aceleração
+      operationId: listPrograms
+      tags:
+        - Rest.ProgramScopes.Programas
+
+      responses:
+        '200':
+          description: Lista com todos os programas
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/ProgramasAceleracao"
+        '401':
+          description: Verify your credentials!
+                
+                
+                
+  /bubble/companies/:
+    get:
+      summary: List companies
+      operationId: listCompanies
+      tags:
+        - Rest.CompanyScopes.Companies
+      parameters:
+      
+        - name: query
+          in: query
+          description: Query (json) com conjunto de chaves e valores que se deseja consultar
+          required: false
+          schema:
+            type: string
+            
+        - name: contains
+          in: query
+          description: Caso queira retornar registros que contenham um valor específico em um campo específico. (Obs) o uso desse parâmetro invalida o parâmetro (query)
+          required: false
+          schema:
+            type: string
+            
+        - name: only_columns
+          in: query
+          description: Para retornar apenas colunas específicas (colunas separadas por vírgula).
+          required: false
+          schema:
+            type:
+              string
+
+      responses:
+        '200':
+          description: Lista com companies
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Companies"
+                
+        '401':
+          description: Verify your credentials!
+                
+                
+  /bubble/companies/by_programs/{programas}:
+    get:
+      summary: Consulta companies a partir de Batches
+      operationId: getCompaniesByBatch
+      tags:
+        - Rest.CompanyScopes.Companies
+      parameters:
+        - name: programas
+          in: path
+          required: true
+          description: Lista de programas separadas por vírgula. (Obs= atualmente ao inserir na lista, itens que fazem parte do mesmo batch (Oxigenio_FEV2022,Oxigenio_MARCO2021) será relevado apenas o Programa mais atual)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Companies"
+        '401':
+          description: Verify your credentials!
+
+
+                
+  /bubble/companies/by_id/{id_mongo}:
+    get:
+      summary: Consulta companies a partir de Batches
+      operationId: getCompanyByIdMongo
+      tags:
+        - Rest.CompanyScopes.Companies
+      parameters:
+        - name: id_mongo
+          in: path
+          required: true
+          description: ID Mongo do Datalake
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        '401':
+          description: Verify your credentials!
+
+
+                
+  /bubble/forms/by_id_by_programs/{args}:
+    get:
+      summary: Consulta Informação dos Forms a partir do ID da Company e do Programa
+      operationId: getFormsByIdByPrograms
+      tags:
+        - Rest.CompanyScopes.Companies
+      parameters:
+        - name: args
+          in: path
+          required: true
+          description: String (in path) com parâmetros e valores.
+          example: /company_id_miner=89878&list_programs=Bauducco_2022 ou /company_id_datalake=111999&list_programs=Bauducco_2022
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista com todos os programas que fazem parte do Batch
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Forms"
+        '401':
+          description: Verify your credentials!
+
+
+                
+  /bubble/companies/post_companies_in_miner/:
+    post:
+      summary: Insere companies no miner (Company, BatchStartup), a partir do programa
+      operationId: postCompaniesInMinerCompanyAndBatchStartup
+      tags:
+        - Rest.CompanyScopes.Companies
+      parameters:
+        - name: programa
+          in: query
+          required: true
+          description: Recebe o programa que contém as companhias que se quer inserir no batchStartup
+          schema:
+            type: string
+      responses:
+        
+        '200':
+          description: Caso sucesso, retorna um log de processamento. Informando se todas as etapas ocorrem com sucesso ou não.
+      
+        '400':
+          description: Erro ocorrido em processamento.
+          
+        '401':
+          description: Verify your credentials!
+
+
+    
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: token
+  schemas:
+  
+    ProgramasAceleracao:
+    
+      properties:
+      
+        programas:
+          type: array
+          items:
+            type: string
+            
+        number_of_records:
+          type: number
+        
+    Company:
+    
+      required:
+        - _id
+        
+      properties:
+      
+        _id:
+          type: object
+          format: ObjectId
+        company_nome:
+          type: string
+        address:
+          type: string
+        cnpj:
+          type: string
+        company_type:
+          type: string
+        data_fundacao:
+          type: string
+        dl_created_at:
+          type: string
+        dl_updated_at:
+          type: string
+        dl_deleted_at:
+          type: string
+        domain:
+          type: string
+        domain_name:
+          type: string
+        empresa_aberta:
+          type: string
+        facebook:
+          type: string
+        have_in_miner:
+          type: boolean
+        id_forms:
+          type: array
+        id_miner:
+          type: string
+        linkedin:
+          type: string
+        not_linkedin:
+          type: boolean
+        programas_aceleracao:
+          type: array
+        url:
+          type: string
+        url_funcional:
+          type: boolean
+        url_null:
+          type: boolean
+    
+    Companies:
+      properties:
+      
+        companies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Company"
+            
+        number_of_records:
+          type: number
+    
+    
+    Form:
+      properties:
+      
+        AtualizacaoEmpresa:
+          type: string
+        AtualizacaoInvestimento:
+          type: string
+        AtualizacaoMercado:
+          type: string
+        AtualizacaoProduto:
+          type: string
+        AtualizacaoPrograma:
+          type: string
+        AtualizacaoTime:
+          type: string
+        AtualizacaoUsuario:
+          type: string
+        CNPJ:
+          type: string
+        CodEmpresa:
+          type: string
+        ComoConheceu:
+          type: string
+        DataAtualizacao:
+          type: string
+        DataCadastro:
+          type: string
+        DataFundacao:
+          type: string
+        DescricaoExperiencia:
+          type: string
+        DescricaoOportunidade:
+          type: string
+        Diferencial:
+          type: string
+        Email:
+          type: string
+        EmpresaAberta:
+          type: string
+        EstagioProduto:
+          type: string
+        EstagioReceita:
+          type: string
+        EstagioTracao:
+          type: string
+        Expectativa1:
+          type: string
+        Expectativa2:
+          type: string
+        Expectativa3:
+          type: string
+        Facebook:
+          type: string
+        FundadoresEmpreenderam:
+          type: string
+        FundadoresResultadosObtidos:
+          type: string
+        FundadoresTrabalharamJuntos:
+          type: string
+        JaAcelerado:
+          type: number
+        Linkedin:
+          type: string
+        Localizacao:
+          type: string
+        MembrosPrograma:
+          type: string
+        ModeloNegocio:
+          type: string
+        ModeloNegocioFuncionamento:
+          type: string
+        ModeloNegocioOutros:
+          type: string
+        NomeEmpreendedor:
+          type: string
+        NomeEmpresa:
+          type: string
+        NumeroColaboradores:
+          type: number
+        ParaQuemVende:
+          type: string
+        ParaQuemVendeOutros:
+          type: string
+        Pitch:
+          type: string
+        PorqueParticipar:
+          type: string
+        Possibilidades:
+          type: string
+        PossuiApp:
+          type: string
+        QualAceleracao:
+          type: string
+        RecebeuInvestimento:
+          type: string
+        ReceitaDozeMeses:
+          type: string
+        ReceitaTresMeses:
+          type: string
+        Site:
+          type: string
+        Skype:
+          type: string
+        SobrenomeEmpreendedor:
+          type: string
+        Telefone:
+          type: string
+        Temas:
+          type: string
+        TemasOutros:
+          type: string
+        Tracao:
+          type: string
+        UltimaRealizacao:
+          type: string
+        UrlAppStore:
+          type: string
+        UrlDemonstracao:
+          type: string
+        UrlGooglePlay:
+          type: string
+        UrlPitch:
+          type: string
+        id_forms:
+          type: number
+        programa_aceleracao:
+          type: string
+        programas_aceleracao:
+          type: array
+          
+        competitors:
+          type: array
+          properties:
+            competitor_name:
+              type: string
+            competitor_url:
+              type: string
+    
+        founders:
+          type: array
+          properties:
+            competitor_name:
+              type: string
+            competitor_url:
+              type: string
+    
+        investment_rounds:
+          type: array
+          properties:
+            competitor_name:
+              type: string
+            competitor_url:
+              type: string
+              
+    Forms:
+      properties:
+      
+        forms:
+          type: array
+          items:
+            $ref: "#/components/schemas/Form"
+            
+    
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
