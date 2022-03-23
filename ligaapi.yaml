@@ -3,14 +3,14 @@ info:
   version: 1.0.0
   title:  LigaAPI
   license:
-    name: MIT
+    name: Liga Ventures
 
 security:
   - ApiKeyAuth: []
     
 servers:
-  - url: https://api.liga.ventures/
   - url: https://dev.api.liga.ventures/
+  - url: https://api.liga.ventures/
   
 # tags are used for organizing operations
 tags:
@@ -78,7 +78,13 @@ paths:
           content:
             application/json:    
               schema:
-                $ref: "#/components/schemas/Companies"
+                properties:
+                  companies:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Company"
+                  number_of_records:
+                    type: number
                 
         '401':
           description: Verify your credentials!
@@ -103,7 +109,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Companies"
+                properties:
+                  companies:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Company"
+                  number_of_records:
+                    type: number
         '401':
           description: Verify your credentials!
 
@@ -152,9 +164,13 @@ paths:
         '200':
           description: Lista com todos os programas que fazem parte do Batch
           content:
-            application/json:    
+            application/json:
               schema:
-                $ref: "#/components/schemas/Forms"
+                properties:
+                  forms:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Form"
         '401':
           description: Verify your credentials!
 
@@ -173,6 +189,196 @@ paths:
           description: Recebe o programa que contém as companhias que se quer inserir no batchStartup
           schema:
             type: string
+      responses:
+        
+        '200':
+          description: Caso sucesso, retorna um log de processamento. Informando se todas as etapas ocorrem com sucesso ou não.
+      
+        '400':
+          description: Erro ocorrido em processamento.
+          
+        '401':
+          description: Verify your credentials!
+
+
+
+  /tech/list:
+    get:
+      summary: Lista todas as tecnologias
+      operationId: listAllTecs
+      tags:
+        - Rest.CategoryScopes.Techs
+      responses:
+        
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                properties:
+                  techs:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Tech"
+                  number_of_records:
+                    type: number
+      
+        '401':
+          description: Verify your credentials!
+
+
+
+  /market/list:
+    get:
+      summary: Lista todos 'Markets'
+      operationId: listAllMarkets
+      tags:
+        - Rest.CategoryScopes.Markets
+      responses:
+        
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                properties:
+                  markets:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Market"
+                  number_of_records:
+                    type: number
+      
+        '401':
+          description: Verify your credentials!
+
+
+
+  /sector/list/:
+    get:
+      summary: Lista todas os 'Sectors'
+      operationId: listAllSectors
+      tags:
+        - Rest.CategoryScopes.Sectors
+      responses:
+        
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                properties:
+                  sectors:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Sector"
+                  number_of_records:
+                    type: number
+      
+        '401':
+          description: Verify your credentials!
+
+
+
+  /solution/list:
+    get:
+      summary: Lista todas os 'Solutions'
+      operationId: listAllSolutions
+      tags:
+        - Rest.CategoryScopes.Solutions
+      responses:
+        
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                properties:
+                  solutions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Solution"
+                  number_of_records:
+                    type: number
+      
+        '401':
+          description: Verify your credentials!
+
+
+
+  /linkedin/companies/:
+    get:
+      summary: Lista linkedins de companies
+      operationId: listLinkedinCompanies
+      tags:
+        - Rest.LinkedinScopes.Companies
+      responses:
+        
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                properties:
+                  linkedin_companies:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/LinkedinCompany"
+                  number_of_records:
+                    type: number
+      
+        '401':
+          description: Verify your credentials!
+
+
+
+  /contacts/:
+    get:
+      summary: Lista 'Contacts'
+      operationId: listContacts
+      tags:
+        - Rest.UserScopes.Contacts
+      parameters:
+        - name: query
+          in: query
+          description: Parâmetros e valores para consulta personalizada
+          example: '{"miner_id": "xx_xx"} consulta contatos pelo id do miner de uma company'
+          schema:
+            type: string
+        
+        
+      responses:
+        
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                properties:
+                  contacts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Contact"
+                  number_of_records:
+                    type: number
+      
+        '401':
+          description: Verify your credentials!
+
+  /contacts/insert/:
+    post:
+      summary: "Insere 'contact' no datalake"
+      operationId: postContact
+      tags:
+        - Rest.UserScopes.Contacts
+      parameters:
+        - name: form
+          in: query
+          required: true
+          description: "Recebe o programa que contém as companhias que se quer inserir no batchStartup"
+          schema:
+            $ref: '#/components/schemas/NewContact'
+              
       responses:
         
         '200':
@@ -244,6 +450,8 @@ components:
           type: boolean
         id_forms:
           type: array
+          items:
+            type: number
         id_miner:
           type: string
         linkedin:
@@ -252,23 +460,14 @@ components:
           type: boolean
         programas_aceleracao:
           type: array
+          items:
+            type: string
         url:
           type: string
         url_funcional:
           type: boolean
         url_null:
           type: boolean
-    
-    Companies:
-      properties:
-      
-        companies:
-          type: array
-          items:
-            $ref: "#/components/schemas/Company"
-            
-        number_of_records:
-          type: number
     
     
     Form:
@@ -400,40 +599,415 @@ components:
           type: string
         programas_aceleracao:
           type: array
+          items:
+            type: string
           
         competitors:
           type: array
-          properties:
-            competitor_name:
-              type: string
-            competitor_url:
-              type: string
+          items:
+            properties:
+              competitor_name:
+                type: string
+              competitor_url:
+                type: string
     
         founders:
           type: array
-          properties:
-            competitor_name:
-              type: string
-            competitor_url:
-              type: string
+          items:
+            properties:
+              founder_name:
+                type: string
+              fulltime_dedication:
+                type: string
+              linkedin:
+                type: string
+              position:
+                type: string
+              startup_shares:
+                type: string
     
         investment_rounds:
           type: array
-          properties:
-            competitor_name:
-              type: string
-            competitor_url:
-              type: string
+          items:
+            properties:
+              investment_amount:
+                type: string
+              investment_round:
+                type: string
+              investment_shares:
+                type: string
+              investor:
+                type: string
+       
+       
+    Tech:
+      properties:
+        _id:
+          type: object
+          format: ObjectId
+        dl_created_at:
+          type: string
+          example: "2021-12-17 20:25:25"
+        dl_deleted_at:
+          type: string
+          example: "2021-12-17 21:25:25"
+        dl_updated_at:
+          type: string
+          example: "2021-12-17 23:25:25"
+        first_level:
+          type: string
+          example: "IoT"
+
+  
+    Market:
+      properties:
+        _id:
+          type: object
+          format: ObjectId
+        dl_created_at:
+          type: string
+          example: "2021-12-17 20:25:25"
+        dl_deleted_at:
+          type: string
+          example: "2021-12-17 21:25:25"
+        dl_updated_at:
+          type: string
+          example: "2021-12-17 23:25:25"
+        first_level:
+          type: string
+          example: "AgTech"
+
+    
               
-    Forms:
+    Sector:
+      properties:
+        _id:
+          type: object
+          format: ObjectId
+        dl_created_at:
+          type: string
+          example: "2021-12-17 20:25:25"
+        dl_deleted_at:
+          type: string
+          example: "2021-12-17 21:25:25"
+        dl_updated_at:
+          type: string
+          example: "2021-12-17 23:25:25"
+        first_level:
+          type: string
+          example: "Agro"
+        second_level:
+          type: string
+          example: "Aprimoramento genético"
+              
+    # Sectors:
+    #   properties:
+      
+    #     sectors:
+    #       type: array
+    #       items:
+    #         $ref: "#/components/schemas/Sector"
+        
+    #     number_of_records:
+    #       type:
+    #         number
+
+              
+    Solution:
+      properties:
+        _id:
+          type: object
+          format: ObjectId
+        dl_created_at:
+          type: string
+          example: "2021-12-17 20:25:25"
+        dl_deleted_at:
+          type: string
+          example: "2021-12-17 21:25:25"
+        dl_updated_at:
+          type: string
+          example: "2021-12-17 23:25:25"
+        name:
+          type: string
+          example: "Customer Analytics"
+              
+    Solutions:
       properties:
       
-        forms:
+        solutions:
           type: array
           items:
-            $ref: "#/components/schemas/Form"
+            $ref: "#/components/schemas/Solution"
+        
+        number_of_records:
+          type:
+            number
             
-    
+            
+    LinkedinCompany:
+      properties:
+        _id:
+          type:
+            object
+          format:
+            ObjectId
+        category:
+          type:
+            string
+        city:
+          type:
+            string
+        company_name:
+          type:
+            string
+        country:
+          type:
+            string
+        crunchbase_url:
+          type:
+            string
+        description:
+          type:
+            string
+        dl_company_id:
+          type:
+            string
+        dl_created_at:
+          type:
+            string
+        dl_updated_at:
+          type:
+            string
+        domain:
+          type:
+            string
+        employees_count:
+          type:
+            number
+        employees_estimate:
+          type:
+            string
+        employees_range:
+          type:
+            string
+        employees_url:
+          type:
+            string
+        extracted_at:
+          type:
+            string
+        followers_count:
+          type:
+            number
+        founded_on:
+          type:
+            number
+        geographic_area:
+          type:
+            string
+        headquarters:
+          type:
+            string
+        id:
+          type:
+            number
+        id_miner:
+          type:
+            string
+        industries:
+          type: array
+          items:
+            type: string
+        industry:
+          type:
+            string
+        last_funding_currency:
+          type:
+            string
+        last_funding_date:
+          type:
+            string
+        last_funding_investors:
+          type: array
+          items:
+            type: string
+        last_funding_raised:
+          type:
+            string
+        last_funding_type:
+          type:
+            string
+        linkedin_company_id:
+          type:
+            number
+        linkedin_company_url:
+          type:
+            string
+        linkedin_job_search_url:
+          type:
+            string
+        linkedin_url:
+          type:
+            string
+        location:
+          type:
+            string
+        locations:
+          type: array
+          items:
+            properties:
+              address:
+                type: string
+              city:
+                type: string
+              country:
+                type: string
+              geographic_area:
+                type: string
+              postal_code:
+                type: string
+              street:
+                type: string
+        logo_url:
+          type:
+            string
+        name:
+          type:
+            string
+        number_employees:
+          type:
+            number
+        phone:
+          type:
+            string
+        phones:
+          type: array
+          items:
+            type: string
+        
+        postal_code:
+          type:
+            string
+        sales_navigator_company_url:
+          type:
+            string
+        sales_navigator_employees_url:
+          type:
+            string
+        sales_navigator_url:
+          type:
+            string
+        specialities:
+          type:
+            array
+          format:
+            string
+        specialties:
+          type:
+            array
+          format:
+            string
+        start_url:
+          type:
+            string
+        tagline:
+          type:
+            string
+        type:
+          type:
+            string
+        updated_at:
+          type:
+            string
+        website:
+          type:
+            string
+        year_founded:
+          type:
+            number
+            
+            
+    Contact:
+      properties:
+        _id:
+          type: string
+        cod_empresa_forms:
+          type: array
+          items:
+            type: number
+        cod_user_forms:
+          type: number
+        company_nome:
+          type: string
+        dl_company_id:
+          type: string
+        dl_created_at:
+          type: string
+        dl_deleted_at:
+          type: string
+        dl_updated_at:
+          type: string
+        email:
+          type: string
+        first_name:
+          type: string
+        full_name:
+          type: string
+        last_name:
+          type: string
+        linkedin:
+          type: string
+        phone:
+          type: string
+        position:
+          type: string
+        programas_aceleracao:
+          type: array
+          items:
+            type: string
+            
+            
+    NewContact:
+  
+      type: string
+      
+      required:
+        - dl_company_id
+        - email
+        - first_name
+        - last_name
+        
+        
+      properties:
+      
+        cod_empresa_forms:
+          type: array
+          items:
+            type: number
+        company_nome:
+          type: string
+        dl_company_id:
+          type: string
+        email:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        linkedin:
+          type: string
+        phone:
+          type: string
+        position:
+          type: string
+        programas_aceleracao:
+          type: array
+          items:
+            type: string
+            
+            
+
+            
     Error:
       required:
         - code
@@ -444,3 +1018,43 @@ components:
           format: int32
         message:
           type: string
+
+# definitions:
+
+#   NewContact:
+  
+#     type: object
+    
+#     required:
+#       - dl_company_id
+#       - email
+#       - first_name
+#       - last_name
+      
+      
+#     properties:
+#       cod_empresa_forms:
+#         type: array
+#         items:
+#           type: number
+#       company_nome:
+#         type: string
+#       dl_company_id:
+#         type: string
+#       email:
+#         type: string
+#       first_name:
+#         type: string
+#       last_name:
+#         type: string
+#       linkedin:
+#         type: string
+#       phone:
+#         type: string
+#       position:
+#         type: string
+#       programas_aceleracao:
+#         type: array
+#         items:
+#           type: string
+            
