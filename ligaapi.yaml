@@ -260,6 +260,22 @@ paths:
       operationId: listAllSectors
       tags:
         - Rest.CategoryScopes.Sectors
+      
+      
+      parameters:
+        - name: key
+          in: query
+          description: "Chave que se quer pesquisar"
+          schema:
+            type: string
+            enum: ["first_level", "second_level"]
+          
+        - name: value
+          in: query
+          description: "Valor a ser consultado na chave 'key' passada"
+          schema:
+            type: string
+        
       responses:
         
         '200':
@@ -342,9 +358,10 @@ paths:
         - name: query
           in: query
           description: Parâmetros e valores para consulta personalizada
-          example: '{"miner_id": "xx_xx"} consulta contatos pelo id do miner de uma company'
-          schema:
-            type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
         
         
       responses:
@@ -376,16 +393,45 @@ paths:
           in: query
           required: true
           description: "Recebe o programa que contém as companhias que se quer inserir no batchStartup"
-          schema:
-            $ref: '#/components/schemas/NewContact'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewContact'
               
       responses:
-        
-        '200':
-          description: Caso sucesso, retorna um log de processamento. Informando se todas as etapas ocorrem com sucesso ou não.
       
+        '201':
+          description: "Criado com sucesso"
+          content:
+            application/json:    
+              schema:
+                properties:
+                  success:
+                    type: string
+                    description: ID de registro criado
+                  info:
+                    type: string
+                    description: Informações de log
+        
         '400':
-          description: Erro ocorrido em processamento.
+          description: "Erro ao inserir contato"
+          content:
+            application/json:    
+              schema:
+                properties:
+                  error:
+                    type: string
+                    description: Descrição do erro
+        
+        '404':
+          description: "Não existe Company com o id informado em 'dl_company_id' ou já existe esse 'Contact' para esta Company"
+          content:
+            application/json:    
+              schema:
+                properties:
+                  error:
+                    type: string
+                    description: Descrição do erro
           
         '401':
           description: Verify your credentials!
@@ -928,6 +974,7 @@ components:
             
             
     Contact:
+      type: object
       properties:
         _id:
           type: string
@@ -969,7 +1016,7 @@ components:
             
     NewContact:
   
-      type: string
+      type: object
       
       required:
         - dl_company_id
@@ -1018,43 +1065,3 @@ components:
           format: int32
         message:
           type: string
-
-# definitions:
-
-#   NewContact:
-  
-#     type: object
-    
-#     required:
-#       - dl_company_id
-#       - email
-#       - first_name
-#       - last_name
-      
-      
-#     properties:
-#       cod_empresa_forms:
-#         type: array
-#         items:
-#           type: number
-#       company_nome:
-#         type: string
-#       dl_company_id:
-#         type: string
-#       email:
-#         type: string
-#       first_name:
-#         type: string
-#       last_name:
-#         type: string
-#       linkedin:
-#         type: string
-#       phone:
-#         type: string
-#       position:
-#         type: string
-#       programas_aceleracao:
-#         type: array
-#         items:
-#           type: string
-            
